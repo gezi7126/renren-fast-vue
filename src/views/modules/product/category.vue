@@ -20,6 +20,13 @@
             Append
           </el-button>
           <el-button
+            type="text"
+            size="mini"
+            @click="() => edit(data)"
+          >
+            Edit
+          </el-button>
+          <el-button
             v-if="node.childNodes.length == 0"
             type="text"
             size="mini"
@@ -31,15 +38,21 @@
       </span>
     </el-tree>
 
-    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%" :close-on-click-modal="false">
       <el-form :model="category">
         <el-form-item label="商品分类名称">
           <el-input v-model="category.name" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="图标">
+          <el-input v-model="category.icon" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="计量单位">
+          <el-input v-model="category.productUnit" autocomplete="off"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addCategory()">确 定</el-button>
+        <el-button type="primary" :v-model="method"  @click="handleCategory()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -50,7 +63,9 @@ export default {
   data() {
     return {
       data: [],
-      category: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0 },
+      title:"",
+      method:2,
+      category: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0,icon:"", productUnit:""},
       expandedKey: [],
       dialogVisible: false,
       defaultProps: {
@@ -73,13 +88,70 @@ export default {
       });
     },
 
+    edit(data1){
+      this.dialogVisible = true;
+      this.title="修改商品分類";
+      this.method=1;
+      this.$http({
+        url: this.$http.adornUrl(`/product/category/info/${data1.catId}`),
+        method: "get",
+      }).then(({ data }) => {
+        this.category.catId=data.category.catId;
+        this.category.name=data.category.name;
+        this.category.icon=data.category.icon;
+        this.category.productUnit= data.category.productUnit;
+        this.category.parentCid=data.category.parentCid;
+      });
+    },
     append(data) {
+      this.dialogVisible = true;
+      this.title="添加商品分類";
+      this.method=0;
       this.category.parentCid = data.catId;
       this.category.catLevel = data.catLevel * 1 + 1;
       this.category.showStatus = 1;
       this.category.sort = 0;
-      this.dialogVisible = true;
+
+      //清空input 
+       this.category.catId=null;
+        this.category.name="";
+        this.category.icon="";
+        this.category.productUnit= "";
     },
+
+    handleCategory(){
+        if(this.method === 0)
+           this.addCategory();
+        else
+           this.editCategory();
+    },
+
+    editCategory(){
+      //结构赋值，只保存修改结构出来的字段
+       let {catId,name,icon,productUnit} =this.category;
+       this.$http({
+        url: this.$http.adornUrl("/product/category/update"),
+        method: "post",
+        data: this.$http.adornData({ catId,name,icon,productUnit }, false),
+      })
+        .then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: "修改成功",
+              type: "success",
+            });
+            this.dialogVisible = false;
+            //刷新菜單
+            this.getMenus();
+            //展開父節點
+            this.expandedKey = [this.category.parentCid];
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+        .catch(() => {});
+    },
+
     addCategory() {
       //添加商品分类
       this.$http({
