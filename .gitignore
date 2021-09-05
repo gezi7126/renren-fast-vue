@@ -7,6 +7,9 @@ yarn-error.log*
 /test/unit/coverage/
 /test/e2e/reports/
 selenium-debug.log
+/build/
+
+
 
 # Editor directories and files
 .idea
@@ -15,3 +18,9 @@ selenium-debug.log
 *.ntvs*
 *.njsproj
 *.sln
+.babelrc
+.editorconfig
+.eslintrc.js
+.postcssrc.js
+.gulpfile.js
+
