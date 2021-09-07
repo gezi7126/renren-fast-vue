@@ -20,6 +20,7 @@ import {
   MenuItem,
   MenuItemGroup,
   Input,
+  Image,
   InputNumber,
   Radio,
   RadioGroup,
@@ -89,6 +90,7 @@ Vue.use(Submenu)
 Vue.use(MenuItem)
 Vue.use(MenuItemGroup)
 Vue.use(Input)
+Vue.use(Image)
 Vue.use(InputNumber)
 Vue.use(Radio)
 Vue.use(RadioGroup)
