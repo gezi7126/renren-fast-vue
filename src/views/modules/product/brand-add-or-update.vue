@@ -29,7 +29,7 @@
       <el-input v-model="dataForm.firstLetter" placeholder="检索首字母"></el-input>
     </el-form-item>
     <el-form-item label="排序" prop="sort">
-      <el-input v-model="dataForm.sort" placeholder="排序"></el-input>
+      <el-input v-model.number="dataForm.sort" placeholder="排序"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -51,6 +51,16 @@ import singleUpload from '@/components/upload/singleUpload'
   export default {
     components:{singleUpload},
     data () {
+        var validateSearch = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('检索首字母不能为空'));
+        }else if (!(/^[a-zA-Z]$/.test(value))) {
+            callback(new Error('检索首字母必须为a-z或A-Z'));
+        }else{
+            callback();
+        }  
+        
+      };
       return {
         visible: false,
         dataForm: {
@@ -58,9 +68,9 @@ import singleUpload from '@/components/upload/singleUpload'
           name: '',
           logo: '',
           descript: '',
-          showStatus: '',
+          showStatus: 1,
           firstLetter: '',
-          sort: ''
+          sort: 0
         },
         dataRule: {
           name: [
@@ -76,10 +86,24 @@ import singleUpload from '@/components/upload/singleUpload'
             { required: true, message: '显示状态[0-不显示；1-显示]不能为空', trigger: 'blur' }
           ],
           firstLetter: [
-            { required: true, message: '检索首字母不能为空', trigger: 'blur' }
+            { validator:validateSearch, trigger: 'blur' }
           ],
           sort: [
-            { required: true, message: '排序不能为空', trigger: 'blur' }
+            { validator: (rule, value, callback)=>{
+              const t=isNaN(value);
+                  console.log("....");
+                if(value===''){
+                   callback('排序不能为空');
+                }else if (!Number.isInteger(value)) {
+                   callback(new Error('排序必须是大于等于0的数字'));
+                } else {
+                      if (value < 0) {
+                        callback(new Error('排序必须是大于等于0的数字'));
+                      } else {
+                        callback();
+                      }
+                  }
+            }, trigger: 'blur' }
           ]
         }
       }
