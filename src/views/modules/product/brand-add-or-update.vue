@@ -1,4 +1,5 @@
 <template>
+<!--品牌新增/修改页面-->
   <el-dialog
     :title="!dataForm.brandId ? '新增' : '修改'"
     :close-on-click-modal="false"

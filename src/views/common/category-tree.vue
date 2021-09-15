@@ -1,4 +1,5 @@
 <template>
+<!--商品管理-》平台属性-》属性分组页面等要引入的左侧商品三级分类菜单树-->
     <el-tree
       :data="data"
       :props="defaultProps"

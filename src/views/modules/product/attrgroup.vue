@@ -1,4 +1,5 @@
 <template>
+<!--商品管理-》平台属性-》属性分组页面-->
 <el-row :gutter="20">
   <el-col :span="6">
          <category @getClickNode="treeClickNode"></category>
@@ -67,7 +68,7 @@
         <!-- 弹窗, 新增 / 修改 -->
         <attrgroupAddOrUpdate v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></attrgroupAddOrUpdate>
 
-        <!-- 修改关联关系 -->
+        <!-- 关联关系 -->
         <relation-update v-if="relationVisible" ref="relationUpdate" @refreshData="getDataList"></relation-update>
       </div>
   </el-col>
@@ -79,10 +80,12 @@
 <script>
 import category from '../../common/category-tree'
 import attrgroupAddOrUpdate from './attrgroup-add-or-update'
+import RelationUpdate from './attr-group-relation'
 export default {
    components:{
        category,
-       attrgroupAddOrUpdate
+       attrgroupAddOrUpdate,
+       RelationUpdate
    },
    data(){
      return{
@@ -101,10 +104,15 @@ export default {
        }
    },
    methods:{
+
+      //处理分组与属性的关联
+    relationHandle(groupId) {
+      this.relationVisible = true;
+      this.$nextTick(() => {
+        this.$refs.relationUpdate.init(groupId);
+      });
+    },
        
-       selectionChangeHandle(){
-           
-       },
     treeClickNode(data,node,component){
       this.catId=data.catId;
       if(node.level!=3){
@@ -117,6 +125,28 @@ export default {
     getDataList(){
        this.$http({
           url: this.$http.adornUrl(`/product/attrgroup/list/${this.catId}`),
+          method: 'get',
+          params: this.$http.adornParams({
+            page: this.pageIndex,
+            limit: this.pageSize,
+            key: this.dataForm.key
+         })
+      }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+      });
+    },
+
+    //查询全部
+    getAllDataList(){
+      this.$http({
+          url: this.$http.adornUrl(`/product/attrgroup/list/0`),
           method: 'get',
           params: this.$http.adornParams({
             page: this.pageIndex,

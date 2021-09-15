@@ -1,4 +1,5 @@
 <template>
+<!--商品管理-》平台属性-》属性分组-》新增/修改属性分组页面-->
   <el-dialog
     :title="!dataForm.attrGroupId ? '新增' : '修改'"
     :close-on-click-modal="false"
