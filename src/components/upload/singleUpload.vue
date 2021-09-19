@@ -79,13 +79,14 @@
       beforeUpload(file) {
         let _self = this;
         return new Promise((resolve, reject) => {
+          //获取签名后，表单提交数据给oss服务器，参考PostObject，参数说明
           policy().then(response => {
             _self.dataObj.policy = response.data.policy;
             _self.dataObj.signature = response.data.signature;
-            _self.dataObj.ossaccessKeyId = response.data.accessid;
+            _self.dataObj.OSSAccessKeyId = response.data.accessid;
             _self.dataObj.key = response.data.dir +getUUID()+'_${filename}';
-            _self.dataObj.dir = response.data.dir;
-            _self.dataObj.host = response.data.host;
+            //_self.dataObj.dir = response.data.dir;
+            //_self.dataObj.host = response.data.host;
             resolve(true)
           }).catch(err => {
             reject(false)
